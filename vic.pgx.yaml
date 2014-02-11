@@ -17,7 +17,7 @@ block:
   - .rgx: '[\ \t]*\{[\ \t]*\r?\n?'
 comment:
   .any:
-  - .rgx: \#.*\r?\n
+  - .rgx: '[\ \t]*\#.*\r?\n'
   - .ref: blank_line
 double_quoted_string:
   .rgx: (?:"((?:[^\n\\"]|\\"|\\\\|\\[0nt])*?)")

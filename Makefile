@@ -1,6 +1,16 @@
+##################################################
+###COPYRIGHT: 2014. Vikas N Kumar <vikas@cpan.org>
+###AUTHOR: Vikas N Kumar, Ingy Dot Net
+###SOFTWARE: VIC
+##################################################
 GRAMMAR = $(shell echo *.pgx)
-export PERL5LIB=../pegex-pm/lib
-COMPILE_COMMAND = pegex compile $(OPTIONS) --to=
+PEGEX=$(shell which pegex)
+
+ifeq ($(PEGEX),)
+ $(error "You need to install Pegex::Cmd perl package to run this")
+endif
+
+COMPILE_COMMAND = $(PEGEX) compile $(OPTIONS) --to=
 ALL = $(GRAMMAR:%=%.yaml) $(GRAMMAR:%=%.json)
 
 all: $(ALL)
