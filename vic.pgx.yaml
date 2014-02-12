@@ -1,9 +1,17 @@
 ---
 +grammar: vic
 +toprule: program
-+version: 0.0.1
++version: 0.0.2
 DOLLAR:
   .rgx: \$
+EOL:
+  .rgx: \r?\n
+EOS:
+  .rgx: \z
+LCURLY:
+  .rgx: \{
+RCURLY:
+  .rgx: \}
 SEMI:
   .rgx: ;
 blank_line:
@@ -11,10 +19,6 @@ blank_line:
   - +min: 0
     .ref: whitespace
   - .rgx: \r?\n
-block:
-  .all:
-  - .ref: name
-  - .rgx: '[\ \t]*\{[\ \t]*\r?\n?'
 comment:
   .any:
   - .rgx: '[\ \t]*\#.*\r?\n'
@@ -22,10 +26,29 @@ comment:
 double_quoted_string:
   .rgx: (?:"((?:[^\n\\"]|\\"|\\\\|\\[0nt])*?)")
 end_block:
-  .rgx: '[\ \t]*\}[\ \t]*\r?\n?'
+  .all:
+  - +min: 0
+    .ref: whitespace
+  - .ref: RCURLY
+  - +min: 0
+    .ref: whitespace
+  - +max: 1
+    .ref: EOL
+expression:
+  .all:
+  - +min: 0
+    .ref: whitespace
+  - .ref: variable
+  - +min: 0
+    .ref: whitespace
+  - .ref: operator
+  - .ref: value
+  - .ref: SEMI
+  - +max: 1
+    .ref: EOL
 header:
   .any:
-  - .ref: uc_header
+  - .ref: uc_config
   - .ref: comment
 identifier:
   .rgx: ([a-zA-Z][0-9A-Za-z_]*)
@@ -37,6 +60,8 @@ instruction:
   - +min: 0
     .ref: whitespace
   - .ref: SEMI
+  - +max: 1
+    .ref: EOL
 name:
   .all:
   - +min: 0
@@ -52,6 +77,8 @@ number_units:
   - +min: 0
     .ref: whitespace
   - .ref: units
+operator:
+  .rgx: ([=])
 program:
   .all:
   - .ref: uc_select
@@ -59,20 +86,32 @@ program:
     .ref: header
   - +min: 0
     .ref: statement
+  - .ref: EOS
 single_quoted_string:
   .rgx: (?:'((?:[^\n\\']|\\'|\\\\)*?)')
+start_block:
+  .all:
+  - .ref: name
+  - +min: 0
+    .ref: whitespace
+  - .ref: LCURLY
+  - +min: 0
+    .ref: whitespace
+  - +max: 1
+    .ref: EOL
 statement:
   .any:
   - .ref: comment
-  - .ref: block
+  - .ref: start_block
   - .ref: instruction
+  - .ref: expression
   - .ref: end_block
 string:
   .any:
   - .ref: single_quoted_string
   - .ref: double_quoted_string
-uc_header:
-  .rgx: set_(config|org)[\ \t]*(.*);\r?\n
+uc_config:
+  .rgx: config[\ \t]+(.*);\r?\n
 uc_select:
   .rgx: PIC[\ \t]+((?i:P16F690|P16F690X));\r?\n
 units:

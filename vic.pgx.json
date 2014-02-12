@@ -1,9 +1,21 @@
 {
    "+grammar" : "vic",
    "+toprule" : "program",
-   "+version" : "0.0.1",
+   "+version" : "0.0.2",
    "DOLLAR" : {
       ".rgx" : "\\$"
+   },
+   "EOL" : {
+      ".rgx" : "\\r?\\n"
+   },
+   "EOS" : {
+      ".rgx" : "\\z"
+   },
+   "LCURLY" : {
+      ".rgx" : "\\{"
+   },
+   "RCURLY" : {
+      ".rgx" : "\\}"
    },
    "SEMI" : {
       ".rgx" : ";"
@@ -16,16 +28,6 @@
          },
          {
             ".rgx" : "\\r?\\n"
-         }
-      ]
-   },
-   "block" : {
-      ".all" : [
-         {
-            ".ref" : "name"
-         },
-         {
-            ".rgx" : "[\\ \\t]*\\{[\\ \\t]*\\r?\\n?"
          }
       ]
    },
@@ -43,12 +45,56 @@
       ".rgx" : "(?:\"((?:[^\\n\\\\\"]|\\\\\"|\\\\\\\\|\\\\[0nt])*?)\")"
    },
    "end_block" : {
-      ".rgx" : "[\\ \\t]*\\}[\\ \\t]*\\r?\\n?"
+      ".all" : [
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
+         },
+         {
+            ".ref" : "RCURLY"
+         },
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
+         },
+         {
+            "+max" : 1,
+            ".ref" : "EOL"
+         }
+      ]
+   },
+   "expression" : {
+      ".all" : [
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
+         },
+         {
+            ".ref" : "variable"
+         },
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
+         },
+         {
+            ".ref" : "operator"
+         },
+         {
+            ".ref" : "value"
+         },
+         {
+            ".ref" : "SEMI"
+         },
+         {
+            "+max" : 1,
+            ".ref" : "EOL"
+         }
+      ]
    },
    "header" : {
       ".any" : [
          {
-            ".ref" : "uc_header"
+            ".ref" : "uc_config"
          },
          {
             ".ref" : "comment"
@@ -73,6 +119,10 @@
          },
          {
             ".ref" : "SEMI"
+         },
+         {
+            "+max" : 1,
+            ".ref" : "EOL"
          }
       ]
    },
@@ -108,6 +158,9 @@
          }
       ]
    },
+   "operator" : {
+      ".rgx" : "([=])"
+   },
    "program" : {
       ".all" : [
          {
@@ -120,11 +173,36 @@
          {
             "+min" : 0,
             ".ref" : "statement"
+         },
+         {
+            ".ref" : "EOS"
          }
       ]
    },
    "single_quoted_string" : {
       ".rgx" : "(?:'((?:[^\\n\\\\']|\\\\'|\\\\\\\\)*?)')"
+   },
+   "start_block" : {
+      ".all" : [
+         {
+            ".ref" : "name"
+         },
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
+         },
+         {
+            ".ref" : "LCURLY"
+         },
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
+         },
+         {
+            "+max" : 1,
+            ".ref" : "EOL"
+         }
+      ]
    },
    "statement" : {
       ".any" : [
@@ -132,10 +210,13 @@
             ".ref" : "comment"
          },
          {
-            ".ref" : "block"
+            ".ref" : "start_block"
          },
          {
             ".ref" : "instruction"
+         },
+         {
+            ".ref" : "expression"
          },
          {
             ".ref" : "end_block"
@@ -152,8 +233,8 @@
          }
       ]
    },
-   "uc_header" : {
-      ".rgx" : "set_(config|org)[\\ \\t]*(.*);\\r?\\n"
+   "uc_config" : {
+      ".rgx" : "config[\\ \\t]+(.*);\\r?\\n"
    },
    "uc_select" : {
       ".rgx" : "PIC[\\ \\t]+((?i:P16F690|P16F690X));\\r?\\n"
