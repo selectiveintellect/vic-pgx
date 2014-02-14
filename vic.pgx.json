@@ -1,7 +1,7 @@
 {
    "+grammar" : "vic",
    "+toprule" : "program",
-   "+version" : "0.0.2",
+   "+version" : "0.0.3",
    "DOLLAR" : {
       ".rgx" : "\\$"
    },
@@ -10,6 +10,9 @@
    },
    "EOS" : {
       ".rgx" : "\\z"
+   },
+   "EQUAL" : {
+      ".rgx" : "="
    },
    "LCURLY" : {
       ".rgx" : "\\{"
@@ -31,6 +34,20 @@
          }
       ]
    },
+   "block" : {
+      ".all" : [
+         {
+            ".ref" : "start_block"
+         },
+         {
+            "+min" : 0,
+            ".ref" : "statement"
+         },
+         {
+            ".ref" : "end_block"
+         }
+      ]
+   },
    "comment" : {
       ".any" : [
          {
@@ -38,6 +55,34 @@
          },
          {
             ".ref" : "blank_line"
+         }
+      ]
+   },
+   "config_expression" : {
+      ".all" : [
+         {
+            ".ref" : "name"
+         },
+         {
+            ".ref" : "EQUAL"
+         },
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
+         },
+         {
+            ".any" : [
+               {
+                  ".ref" : "number_units"
+               },
+               {
+                  ".ref" : "number"
+               }
+            ]
+         },
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
          }
       ]
    },
@@ -64,30 +109,15 @@
       ]
    },
    "expression" : {
-      ".all" : [
+      ".any" : [
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "lhs_op_rhs"
          },
          {
-            ".ref" : "variable"
+            ".ref" : "lhs_op"
          },
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
-         },
-         {
-            ".ref" : "operator"
-         },
-         {
-            ".ref" : "value"
-         },
-         {
-            ".ref" : "SEMI"
-         },
-         {
-            "+max" : 1,
-            ".ref" : "EOL"
+            ".ref" : "op_rhs"
          }
       ]
    },
@@ -116,6 +146,60 @@
          {
             "+min" : 0,
             ".ref" : "whitespace"
+         },
+         {
+            ".ref" : "SEMI"
+         },
+         {
+            "+max" : 1,
+            ".ref" : "EOL"
+         }
+      ]
+   },
+   "lhs_op" : {
+      ".all" : [
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
+         },
+         {
+            ".ref" : "variable"
+         },
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
+         },
+         {
+            ".ref" : "operator"
+         },
+         {
+            "+max" : 1,
+            ".ref" : "SEMI"
+         },
+         {
+            "+max" : 1,
+            ".ref" : "EOL"
+         }
+      ]
+   },
+   "lhs_op_rhs" : {
+      ".all" : [
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
+         },
+         {
+            ".ref" : "variable"
+         },
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
+         },
+         {
+            ".ref" : "operator"
+         },
+         {
+            ".ref" : "value"
          },
          {
             ".ref" : "SEMI"
@@ -158,8 +242,34 @@
          }
       ]
    },
+   "op_rhs" : {
+      ".all" : [
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
+         },
+         {
+            ".ref" : "operator"
+         },
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
+         },
+         {
+            ".ref" : "variable"
+         },
+         {
+            "+max" : 1,
+            ".ref" : "SEMI"
+         },
+         {
+            "+max" : 1,
+            ".ref" : "EOL"
+         }
+      ]
+   },
    "operator" : {
-      ".rgx" : "([=])"
+      ".rgx" : "((?:!|=|%|\\^|&|\\*|\\~|\\-|\\+|\\||/|<|>){1,2})"
    },
    "program" : {
       ".all" : [
@@ -210,16 +320,13 @@
             ".ref" : "comment"
          },
          {
-            ".ref" : "start_block"
-         },
-         {
             ".ref" : "instruction"
          },
          {
             ".ref" : "expression"
          },
          {
-            ".ref" : "end_block"
+            ".ref" : "block"
          }
       ]
    },
@@ -234,7 +341,27 @@
       ]
    },
    "uc_config" : {
-      ".rgx" : "config[\\ \\t]+(.*);\\r?\\n"
+      ".all" : [
+         {
+            ".rgx" : "config"
+         },
+         {
+            "+min" : 0,
+            ".ref" : "whitespace"
+         },
+         {
+            ".ref" : "name"
+         },
+         {
+            ".ref" : "config_expression"
+         },
+         {
+            ".ref" : "SEMI"
+         },
+         {
+            ".ref" : "EOL"
+         }
+      ]
    },
    "uc_select" : {
       ".rgx" : "PIC[\\ \\t]+((?i:P16F690|P16F690X));\\r?\\n"
@@ -261,6 +388,9 @@
                },
                {
                   ".ref" : "variable"
+               },
+               {
+                  ".ref" : "block"
                }
             ]
          },
