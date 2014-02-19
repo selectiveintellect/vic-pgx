@@ -1,7 +1,7 @@
 {
    "+grammar" : "vic",
    "+toprule" : "program",
-   "+version" : "0.0.3",
+   "+version" : "0.0.4",
    "DOLLAR" : {
       ".rgx" : "\\$"
    },
@@ -369,6 +369,9 @@
    "units" : {
       ".rgx" : "(s|ms|us)"
    },
+   "validated_variable" : {
+      ".ref" : "identifier"
+   },
    "value" : {
       ".all" : [
          {
@@ -391,6 +394,9 @@
                },
                {
                   ".ref" : "block"
+               },
+               {
+                  ".ref" : "validated_variable"
                }
             ]
          },

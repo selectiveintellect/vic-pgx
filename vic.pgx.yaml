@@ -1,7 +1,7 @@
 ---
 +grammar: vic
 +toprule: program
-+version: 0.0.3
++version: 0.0.4
 DOLLAR:
   .rgx: \$
 EOL:
@@ -170,6 +170,8 @@ uc_select:
   .rgx: PIC[\ \t]+((?i:P16F690|P16F690X));\r?\n
 units:
   .rgx: (s|ms|us)
+validated_variable:
+  .ref: identifier
 value:
   .all:
   - +min: 0
@@ -180,6 +182,7 @@ value:
     - .ref: number
     - .ref: variable
     - .ref: block
+    - .ref: validated_variable
   - +min: 0
     .ref: whitespace
 value_comma:
