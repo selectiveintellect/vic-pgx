@@ -1,7 +1,10 @@
 {
    "+grammar" : "vic",
    "+toprule" : "program",
-   "+version" : "0.0.4",
+   "+version" : "0.0.5",
+   "COMMA" : {
+      ".rgx" : ","
+   },
    "DOLLAR" : {
       ".rgx" : "\\$"
    },
@@ -23,14 +26,25 @@
    "SEMI" : {
       ".rgx" : ";"
    },
+   "_" : {
+      ".rgx" : "[\\ \\t]*"
+   },
+   "__" : {
+      ".rgx" : "[\\ \\t]+"
+   },
+   "assign_operator" : {
+      ".rgx" : "((?:\\+|\\-|%|\\^|\\*|\\||&|/)?=)"
+   },
+   "bit_operator" : {
+      ".rgx" : "(\\||\\^|&)"
+   },
    "blank_line" : {
       ".all" : [
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
-            ".rgx" : "\\r?\\n"
+            ".ref" : "EOL"
          }
       ]
    },
@@ -58,6 +72,132 @@
          }
       ]
    },
+   "compare_operator" : {
+      ".rgx" : "((?:!|=|<|>)=|(?:<|>))"
+   },
+   "comparison" : {
+      ".all" : [
+         {
+            ".ref" : "expr_value"
+         },
+         {
+            ".ref" : "compare_operator"
+         },
+         {
+            ".ref" : "expr_value"
+         }
+      ]
+   },
+   "complement" : {
+      ".all" : [
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "complement_operator"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "variable"
+         },
+         {
+            ".ref" : "_"
+         }
+      ]
+   },
+   "complement_operator" : {
+      ".rgx" : "(\\~|!)"
+   },
+   "conditional" : {
+      ".all" : [
+         {
+            ".ref" : "conditional_subject"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "COMMA"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "conditional_predicate"
+         }
+      ]
+   },
+   "conditional_predicate" : {
+      ".any" : [
+         {
+            ".ref" : "conditional_predicate_double"
+         },
+         {
+            ".ref" : "conditional_predicate_single"
+         }
+      ]
+   },
+   "conditional_predicate_double" : {
+      ".all" : [
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "block"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "COMMA"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "block"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "SEMI"
+         },
+         {
+            "+max" : 1,
+            ".ref" : "EOL"
+         }
+      ]
+   },
+   "conditional_predicate_single" : {
+      ".all" : [
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "block"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "SEMI"
+         },
+         {
+            "+max" : 1,
+            ".ref" : "EOL"
+         }
+      ]
+   },
+   "conditional_subject" : {
+      "+min" : 0,
+      ".ref" : "single_conditional",
+      ".sep" : {
+         ".ref" : "logic_operator"
+      }
+   },
    "config_expression" : {
       ".all" : [
          {
@@ -67,8 +207,7 @@
             ".ref" : "EQUAL"
          },
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
             ".any" : [
@@ -81,8 +220,7 @@
             ]
          },
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          }
       ]
    },
@@ -92,19 +230,43 @@
    "end_block" : {
       ".all" : [
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
             ".ref" : "RCURLY"
          },
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
             "+max" : 1,
             ".ref" : "EOL"
+         }
+      ]
+   },
+   "expr_value" : {
+      ".all" : [
+         {
+            ".ref" : "_"
+         },
+         {
+            ".any" : [
+               {
+                  ".ref" : "number"
+               },
+               {
+                  ".ref" : "variable"
+               },
+               {
+                  ".ref" : "number_units"
+               },
+               {
+                  ".ref" : "complement"
+               }
+            ]
+         },
+         {
+            ".ref" : "_"
          }
       ]
    },
@@ -118,6 +280,9 @@
          },
          {
             ".ref" : "op_rhs"
+         },
+         {
+            ".ref" : "conditional"
          }
       ]
    },
@@ -134,18 +299,19 @@
    "identifier" : {
       ".rgx" : "([a-zA-Z][0-9A-Za-z_]*)"
    },
+   "incdec_operator" : {
+      ".rgx" : "(\\+\\+|\\-\\-)"
+   },
    "instruction" : {
       ".all" : [
          {
             ".ref" : "name"
          },
          {
-            "+min" : 0,
             ".ref" : "values"
          },
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
             ".ref" : "SEMI"
@@ -159,18 +325,19 @@
    "lhs_op" : {
       ".all" : [
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
             ".ref" : "variable"
          },
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
-            ".ref" : "operator"
+            ".ref" : "incdec_operator"
+         },
+         {
+            ".ref" : "_"
          },
          {
             "+max" : 1,
@@ -185,21 +352,25 @@
    "lhs_op_rhs" : {
       ".all" : [
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
             ".ref" : "variable"
          },
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
-            ".ref" : "operator"
+            ".ref" : "assign_operator"
          },
          {
-            ".ref" : "value"
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "rhs_expr"
+         },
+         {
+            ".ref" : "_"
          },
          {
             ".ref" : "SEMI"
@@ -210,18 +381,22 @@
          }
       ]
    },
+   "logic_operator" : {
+      ".rgx" : "((?:&|\\|){2})"
+   },
+   "math_operator" : {
+      ".rgx" : "(\\+|\\-|\\*|/|%)"
+   },
    "name" : {
       ".all" : [
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
             ".ref" : "identifier"
          },
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          }
       ]
    },
@@ -234,8 +409,7 @@
             ".ref" : "number"
          },
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
             ".ref" : "units"
@@ -245,18 +419,19 @@
    "op_rhs" : {
       ".all" : [
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
-            ".ref" : "operator"
+            ".ref" : "incdec_operator"
          },
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
             ".ref" : "variable"
+         },
+         {
+            ".ref" : "_"
          },
          {
             "+max" : 1,
@@ -267,9 +442,6 @@
             ".ref" : "EOL"
          }
       ]
-   },
-   "operator" : {
-      ".rgx" : "((?:!|=|%|\\^|&|\\*|\\~|\\-|\\+|\\||/|<|>){1,2})"
    },
    "program" : {
       ".all" : [
@@ -289,6 +461,33 @@
          }
       ]
    },
+   "rhs_expr" : {
+      "+min" : 0,
+      ".ref" : "expr_value",
+      ".sep" : {
+         ".ref" : "rhs_operator"
+      }
+   },
+   "rhs_operator" : {
+      ".any" : [
+         {
+            ".ref" : "math_operator"
+         },
+         {
+            ".ref" : "bit_operator"
+         }
+      ]
+   },
+   "single_conditional" : {
+      ".any" : [
+         {
+            ".ref" : "comparison"
+         },
+         {
+            ".ref" : "complement"
+         }
+      ]
+   },
    "single_quoted_string" : {
       ".rgx" : "(?:'((?:[^\\n\\\\']|\\\\'|\\\\\\\\)*?)')"
    },
@@ -298,15 +497,13 @@
             ".ref" : "name"
          },
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
             ".ref" : "LCURLY"
          },
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
             "+max" : 1,
@@ -346,8 +543,7 @@
             ".rgx" : "config"
          },
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "__"
          },
          {
             ".ref" : "name"
@@ -367,7 +563,7 @@
       ".rgx" : "PIC[\\ \\t]+((?i:P16F690|P16F690X));\\r?\\n"
    },
    "units" : {
-      ".rgx" : "(s|ms|us)"
+      ".rgx" : "(s|ms|us|kHz|Hz|MHz)"
    },
    "validated_variable" : {
       ".ref" : "identifier"
@@ -375,8 +571,7 @@
    "value" : {
       ".all" : [
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
+            ".ref" : "_"
          },
          {
             ".any" : [
@@ -401,31 +596,16 @@
             ]
          },
          {
-            "+min" : 0,
-            ".ref" : "whitespace"
-         }
-      ]
-   },
-   "value_comma" : {
-      ".all" : [
-         {
-            ".ref" : "value"
-         },
-         {
-            ".rgx" : ","
+            ".ref" : "_"
          }
       ]
    },
    "values" : {
-      ".all" : [
-         {
-            "+min" : 0,
-            ".ref" : "value_comma"
-         },
-         {
-            ".ref" : "value"
-         }
-      ]
+      "+min" : 0,
+      ".ref" : "value",
+      ".sep" : {
+         ".ref" : "COMMA"
+      }
    },
    "variable" : {
       ".all" : [
@@ -436,8 +616,5 @@
             ".ref" : "identifier"
          }
       ]
-   },
-   "whitespace" : {
-      ".rgx" : "[\\ \\t]+"
    }
 }
