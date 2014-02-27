@@ -6,30 +6,18 @@ COMMA:
   .rgx: ','
 DOLLAR:
   .rgx: \$
-EOL:
-  .rgx: \r?\n
 EOS:
   .rgx: \z
-EQUAL:
-  .rgx: =
-LCURLY:
-  .rgx: \{
-RCURLY:
-  .rgx: \}
-SEMI:
-  .rgx: ;
 _:
   .rgx: '[\ \t]*'
 __:
   .rgx: '[\ \t]+'
 assign_operator:
-  .rgx: ((?:\+|\-|%|\^|\*|\||&|/)?=)
+  .rgx: ([\+\-%\^\*\|&/]?=)
 bit_operator:
-  .rgx: (\||\^|&)
+  .rgx: ([\|\^&])
 blank_line:
-  .all:
-  - .ref: _
-  - .ref: EOL
+  .rgx: '[\ \t]*\r?\n'
 block:
   .all:
   - .ref: start_block
@@ -41,7 +29,7 @@ comment:
   - .rgx: '[\ \t]*\#.*\r?\n'
   - .ref: blank_line
 compare_operator:
-  .rgx: ((?:!|=|<|>)=|(?:<|>))
+  .rgx: ([!=<>]=|(?:<|>))
 comparison:
   .all:
   - .ref: expr_value
@@ -75,18 +63,12 @@ conditional_predicate_double:
   - .ref: COMMA
   - .ref: _
   - .ref: block
-  - .ref: _
-  - .ref: SEMI
-  - +max: 1
-    .ref: EOL
+  - .ref: line_ending
 conditional_predicate_single:
   .all:
   - .ref: _
   - .ref: block
-  - .ref: _
-  - .ref: SEMI
-  - +max: 1
-    .ref: EOL
+  - .ref: line_ending
 conditional_subject:
   +min: 0
   .ref: single_conditional
@@ -95,8 +77,7 @@ conditional_subject:
 config_expression:
   .all:
   - .ref: name
-  - .ref: EQUAL
-  - .ref: _
+  - .rgx: =[\ \t]*
   - .any:
     - .ref: number_units
     - .ref: number
@@ -104,12 +85,7 @@ config_expression:
 double_quoted_string:
   .rgx: (?:"((?:[^\n\\"]|\\"|\\\\|\\[0nt])*?)")
 end_block:
-  .all:
-  - .ref: _
-  - .ref: RCURLY
-  - .ref: _
-  - +max: 1
-    .ref: EOL
+  .rgx: '[\ \t]*\}[\ \t]*\r?\n?'
 expr_value:
   .all:
   - .ref: _
@@ -137,21 +113,14 @@ instruction:
   .all:
   - .ref: name
   - .ref: values
-  - .ref: _
-  - .ref: SEMI
-  - +max: 1
-    .ref: EOL
+  - .ref: line_ending
 lhs_op:
   .all:
   - .ref: _
   - .ref: variable
   - .ref: _
   - .ref: incdec_operator
-  - .ref: _
-  - +max: 1
-    .ref: SEMI
-  - +max: 1
-    .ref: EOL
+  - .rgx: '[\ \t]*;?[\ \t]*\r?\n?'
 lhs_op_rhs:
   .all:
   - .ref: _
@@ -160,21 +129,20 @@ lhs_op_rhs:
   - .ref: assign_operator
   - .ref: _
   - .ref: rhs_expr
-  - .ref: _
-  - .ref: SEMI
-  - +max: 1
-    .ref: EOL
+  - .ref: line_ending
+line_ending:
+  .rgx: '[\ \t]*;[\ \t]*\r?\n?'
 logic_operator:
-  .rgx: ((?:&|\|){2})
+  .rgx: ([&\|]{2})
 math_operator:
-  .rgx: (\+|\-|\*|/|%)
+  .rgx: ([\+\-\*/%])
 name:
   .all:
   - .ref: _
   - .ref: identifier
   - .ref: _
 number:
-  .rgx: (0x[0-9a-fA-F]+|0X[0-9a-fA-F]+|[0-9]+)
+  .rgx: (0[xX][0-9a-fA-F]+|[0-9]+)
 number_units:
   .all:
   - .ref: number
@@ -186,11 +154,7 @@ op_rhs:
   - .ref: incdec_operator
   - .ref: _
   - .ref: variable
-  - .ref: _
-  - +max: 1
-    .ref: SEMI
-  - +max: 1
-    .ref: EOL
+  - .rgx: '[\ \t]*;?[\ \t]*\r?\n?'
 program:
   .all:
   - .ref: uc_select
@@ -217,11 +181,7 @@ single_quoted_string:
 start_block:
   .all:
   - .ref: name
-  - .ref: _
-  - .ref: LCURLY
-  - .ref: _
-  - +max: 1
-    .ref: EOL
+  - .rgx: '[\ \t]*\{[\ \t]*\r?\n?'
 statement:
   .any:
   - .ref: comment
@@ -238,10 +198,9 @@ uc_config:
   - .ref: __
   - .ref: name
   - .ref: config_expression
-  - .ref: SEMI
-  - .ref: EOL
+  - .ref: line_ending
 uc_select:
-  .rgx: PIC[\ \t]+((?i:P16F690|P16F690X));\r?\n
+  .rgx: PIC[\ \t]+((?i:P16F690|P16F690X))[\ \t]*;[\ \t]*\r?\n?
 units:
   .rgx: (s|ms|us|kHz|Hz|MHz)
 validated_variable:
