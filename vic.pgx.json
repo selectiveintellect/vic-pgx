@@ -1,7 +1,7 @@
 {
    "+grammar" : "vic",
    "+toprule" : "program",
-   "+version" : "0.0.5",
+   "+version" : "0.0.6",
    "COMMA" : {
       ".rgx" : ","
    },
@@ -209,6 +209,9 @@
                },
                {
                   ".ref" : "complement"
+               },
+               {
+                  ".ref" : "modifier_variable"
                }
             ]
          },
@@ -314,6 +317,19 @@
    },
    "math_operator" : {
       ".rgx" : "([\\+\\-\\*/%])"
+   },
+   "modifier_variable" : {
+      ".all" : [
+         {
+            ".ref" : "identifier"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "variable"
+         }
+      ]
    },
    "name" : {
       ".all" : [
@@ -456,7 +472,14 @@
             ".ref" : "__"
          },
          {
-            ".ref" : "name"
+            ".any" : [
+               {
+                  ".ref" : "name"
+               },
+               {
+                  ".ref" : "variable"
+               }
+            ]
          },
          {
             ".ref" : "config_expression"
@@ -499,6 +522,9 @@
                },
                {
                   ".ref" : "validated_variable"
+               },
+               {
+                  ".ref" : "modifier_variable"
                }
             ]
          },

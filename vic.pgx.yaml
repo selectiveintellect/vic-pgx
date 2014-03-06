@@ -1,7 +1,7 @@
 ---
 +grammar: vic
 +toprule: program
-+version: 0.0.5
++version: 0.0.6
 COMMA:
   .rgx: ','
 DOLLAR:
@@ -94,6 +94,7 @@ expr_value:
     - .ref: variable
     - .ref: number_units
     - .ref: complement
+    - .ref: modifier_variable
   - .ref: _
 expression:
   .any:
@@ -136,6 +137,11 @@ logic_operator:
   .rgx: ([&\|]{2})
 math_operator:
   .rgx: ([\+\-\*/%])
+modifier_variable:
+  .all:
+  - .ref: identifier
+  - .ref: _
+  - .ref: variable
 name:
   .all:
   - .ref: _
@@ -196,7 +202,9 @@ uc_config:
   .all:
   - .rgx: config
   - .ref: __
-  - .ref: name
+  - .any:
+    - .ref: name
+    - .ref: variable
   - .ref: config_expression
   - .ref: line_ending
 uc_select:
@@ -215,6 +223,7 @@ value:
     - .ref: variable
     - .ref: block
     - .ref: validated_variable
+    - .ref: modifier_variable
   - .ref: _
 values:
   +min: 0
