@@ -1,7 +1,7 @@
 {
    "+grammar" : "vic",
    "+toprule" : "program",
-   "+version" : "0.0.6",
+   "+version" : "0.1.0",
    "COMMA" : {
       ".rgx" : ","
    },
@@ -17,16 +17,7 @@
    "__" : {
       ".rgx" : "[\\ \\t]+"
    },
-   "assign_operator" : {
-      ".rgx" : "([\\+\\-%\\^\\*\\|&/]?=)"
-   },
-   "bit_operator" : {
-      ".rgx" : "([\\|\\^&])"
-   },
-   "blank_line" : {
-      ".rgx" : "[\\ \\t]*\\r?\\n"
-   },
-   "block" : {
+   "anonymous_block" : {
       ".all" : [
          {
             ".ref" : "start_block"
@@ -39,6 +30,132 @@
             ".ref" : "end_block"
          }
       ]
+   },
+   "any_conditional" : {
+      ".any" : [
+         {
+            ".ref" : "single_conditional"
+         },
+         {
+            ".ref" : "nested_conditional"
+         }
+      ]
+   },
+   "assert_comparison" : {
+      ".all" : [
+         {
+            ".ref" : "assert_value"
+         },
+         {
+            ".ref" : "compare_operator"
+         },
+         {
+            ".ref" : "assert_value"
+         }
+      ]
+   },
+   "assert_condition" : {
+      ".ref" : "assert_comparison"
+   },
+   "assert_statement" : {
+      ".all" : [
+         {
+            ".ref" : "name"
+         },
+         {
+            ".ref" : "assert_condition"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            "+max" : 1,
+            ".all" : [
+               {
+                  ".ref" : "COMMA"
+               },
+               {
+                  ".ref" : "_"
+               },
+               {
+                  ".ref" : "string"
+               }
+            ]
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "line_ending"
+         }
+      ]
+   },
+   "assert_value" : {
+      ".all" : [
+         {
+            ".ref" : "_"
+         },
+         {
+            ".any" : [
+               {
+                  ".ref" : "validated_variable"
+               },
+               {
+                  ".ref" : "variable"
+               },
+               {
+                  ".ref" : "number"
+               }
+            ]
+         },
+         {
+            ".ref" : "_"
+         }
+      ]
+   },
+   "assign_expr" : {
+      ".all" : [
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "variable"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "assign_operator"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "rhs_expr"
+         }
+      ]
+   },
+   "assign_operator" : {
+      ".any" : [
+         {
+            ".rgx" : "([\\+\\-%\\^\\*\\|&/]?=)"
+         },
+         {
+            ".ref" : "shift_assign_operator"
+         }
+      ]
+   },
+   "bit_operator" : {
+      ".rgx" : "([\\|\\^&])"
+   },
+   "blank_line" : {
+      ".rgx" : "[\\ \\t]*\\r?\\n"
+   },
+   "block" : {
+      ".ref" : "named_block"
+   },
+   "boolean" : {
+      ".rgx" : "(TRUE|FALSE|true|false|0|1)"
    },
    "comment" : {
       ".any" : [
@@ -78,7 +195,7 @@
             ".ref" : "_"
          },
          {
-            ".ref" : "variable"
+            ".ref" : "rhs_expr"
          },
          {
             ".ref" : "_"
@@ -88,95 +205,36 @@
    "complement_operator" : {
       ".rgx" : "(\\~|!)"
    },
-   "conditional" : {
-      ".all" : [
-         {
-            ".ref" : "conditional_subject"
-         },
-         {
-            ".ref" : "_"
-         },
-         {
-            ".ref" : "COMMA"
-         },
-         {
-            ".ref" : "_"
-         },
-         {
-            ".ref" : "conditional_predicate"
-         }
-      ]
-   },
    "conditional_predicate" : {
-      ".any" : [
-         {
-            ".ref" : "conditional_predicate_double"
-         },
-         {
-            ".ref" : "conditional_predicate_single"
-         }
-      ]
-   },
-   "conditional_predicate_double" : {
       ".all" : [
          {
             ".ref" : "_"
          },
          {
-            ".ref" : "block"
+            ".ref" : "anonymous_block"
          },
          {
             ".ref" : "_"
          },
          {
-            ".ref" : "COMMA"
-         },
-         {
-            ".ref" : "_"
-         },
-         {
-            ".ref" : "block"
-         },
-         {
-            ".ref" : "line_ending"
-         }
-      ]
-   },
-   "conditional_predicate_single" : {
-      ".all" : [
-         {
-            ".ref" : "_"
-         },
-         {
-            ".ref" : "block"
-         },
-         {
-            ".ref" : "line_ending"
-         }
-      ]
-   },
-   "conditional_subject" : {
-      "+min" : 0,
-      ".ref" : "single_conditional",
-      ".sep" : {
-         ".ref" : "logic_operator"
-      }
-   },
-   "config_expression" : {
-      ".all" : [
-         {
-            ".ref" : "name"
-         },
-         {
-            ".rgx" : "=[\\ \\t]*"
-         },
-         {
-            ".any" : [
+            "+max" : 1,
+            ".all" : [
                {
-                  ".ref" : "number_units"
+                  ".rgx" : "else"
                },
                {
-                  ".ref" : "number"
+                  ".ref" : "_"
+               },
+               {
+                  "+min" : 0,
+                  ".any" : [
+                     {
+                        ".ref" : "anonymous_block"
+                     },
+                     {
+                        ".ref" : "conditional_statement"
+                     }
+                  ]
                }
             ]
          },
@@ -185,11 +243,50 @@
          }
       ]
    },
+   "conditional_statement" : {
+      ".all" : [
+         {
+            ".ref" : "_"
+         },
+         {
+            ".rgx" : "(if|while)"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "conditional_subject"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "conditional_predicate"
+         },
+         {
+            "+max" : 1,
+            ".ref" : "line_ending"
+         }
+      ]
+   },
+   "conditional_subject" : {
+      ".any" : [
+         {
+            ".ref" : "single_conditional_subject"
+         },
+         {
+            ".ref" : "nested_conditional_subject"
+         }
+      ]
+   },
    "double_quoted_string" : {
       ".rgx" : "(?:\"((?:[^\\n\\\\\"]|\\\\\"|\\\\\\\\|\\\\[0nt])*?)\")"
    },
    "end_block" : {
       ".rgx" : "[\\ \\t]*\\}[\\ \\t]*\\r?\\n?"
+   },
+   "end_nested_expr" : {
+      ".rgx" : "[\\ \\t]*\\)[\\ \\t]*"
    },
    "expr_value" : {
       ".all" : [
@@ -212,6 +309,9 @@
                },
                {
                   ".ref" : "modifier_variable"
+               },
+               {
+                  ".ref" : "nested_expr_value"
                }
             ]
          },
@@ -221,25 +321,26 @@
       ]
    },
    "expression" : {
-      ".any" : [
+      ".all" : [
          {
-            ".ref" : "lhs_op_rhs"
+            ".any" : [
+               {
+                  ".ref" : "assign_expr"
+               },
+               {
+                  ".ref" : "unary_expr"
+               }
+            ]
          },
          {
-            ".ref" : "lhs_op"
-         },
-         {
-            ".ref" : "op_rhs"
-         },
-         {
-            ".ref" : "conditional"
+            ".ref" : "line_ending"
          }
       ]
    },
    "header" : {
       ".any" : [
          {
-            ".ref" : "uc_config"
+            ".ref" : "pragmas"
          },
          {
             ".ref" : "comment"
@@ -249,8 +350,8 @@
    "identifier" : {
       ".rgx" : "([a-zA-Z][0-9A-Za-z_]*)"
    },
-   "incdec_operator" : {
-      ".rgx" : "(\\+\\+|\\-\\-)"
+   "identifier_without_keyword" : {
+      ".rgx" : "(?!if|else|while|true|false|TRUE|FALSE)([a-zA-Z][0-9A-Za-z_]*)"
    },
    "instruction" : {
       ".all" : [
@@ -259,50 +360,6 @@
          },
          {
             ".ref" : "values"
-         },
-         {
-            ".ref" : "line_ending"
-         }
-      ]
-   },
-   "lhs_op" : {
-      ".all" : [
-         {
-            ".ref" : "_"
-         },
-         {
-            ".ref" : "variable"
-         },
-         {
-            ".ref" : "_"
-         },
-         {
-            ".ref" : "incdec_operator"
-         },
-         {
-            ".rgx" : "[\\ \\t]*;?[\\ \\t]*\\r?\\n?"
-         }
-      ]
-   },
-   "lhs_op_rhs" : {
-      ".all" : [
-         {
-            ".ref" : "_"
-         },
-         {
-            ".ref" : "variable"
-         },
-         {
-            ".ref" : "_"
-         },
-         {
-            ".ref" : "assign_operator"
-         },
-         {
-            ".ref" : "_"
-         },
-         {
-            ".ref" : "rhs_expr"
          },
          {
             ".ref" : "line_ending"
@@ -321,7 +378,7 @@
    "modifier_variable" : {
       ".all" : [
          {
-            ".ref" : "identifier"
+            ".ref" : "identifier_without_keyword"
          },
          {
             ".ref" : "_"
@@ -337,15 +394,71 @@
             ".ref" : "_"
          },
          {
-            ".ref" : "identifier"
+            ".ref" : "identifier_without_keyword"
          },
          {
             ".ref" : "_"
          }
       ]
    },
+   "named_block" : {
+      ".all" : [
+         {
+            ".ref" : "name"
+         },
+         {
+            ".ref" : "anonymous_block"
+         }
+      ]
+   },
+   "nested_conditional" : {
+      ".all" : [
+         {
+            ".ref" : "start_nested_expr"
+         },
+         {
+            ".ref" : "single_conditional"
+         },
+         {
+            ".ref" : "end_nested_expr"
+         }
+      ]
+   },
+   "nested_conditional_subject" : {
+      ".all" : [
+         {
+            ".ref" : "start_nested_expr"
+         },
+         {
+            ".ref" : "single_conditional_subject"
+         },
+         {
+            ".ref" : "end_nested_expr"
+         }
+      ]
+   },
+   "nested_expr_value" : {
+      ".all" : [
+         {
+            ".ref" : "start_nested_expr"
+         },
+         {
+            ".ref" : "rhs_expr"
+         },
+         {
+            ".ref" : "end_nested_expr"
+         }
+      ]
+   },
    "number" : {
-      ".rgx" : "(0[xX][0-9a-fA-F]+|[0-9]+)"
+      ".any" : [
+         {
+            ".rgx" : "(0[xX][0-9a-fA-F]+|-?[0-9]+)"
+         },
+         {
+            ".ref" : "boolean"
+         }
+      ]
    },
    "number_units" : {
       ".all" : [
@@ -360,22 +473,63 @@
          }
       ]
    },
-   "op_rhs" : {
+   "pragma_expression" : {
       ".all" : [
          {
+            ".ref" : "name"
+         },
+         {
+            ".rgx" : "=[\\ \\t]*"
+         },
+         {
+            ".any" : [
+               {
+                  ".ref" : "number_units"
+               },
+               {
+                  ".ref" : "number"
+               },
+               {
+                  ".ref" : "string"
+               }
+            ]
+         },
+         {
             ".ref" : "_"
+         }
+      ]
+   },
+   "pragmas" : {
+      ".all" : [
+         {
+            ".rgx" : "pragma"
          },
          {
-            ".ref" : "incdec_operator"
+            ".ref" : "__"
          },
          {
-            ".ref" : "_"
+            ".any" : [
+               {
+                  ".ref" : "variable"
+               },
+               {
+                  ".ref" : "name"
+               }
+            ]
          },
          {
-            ".ref" : "variable"
+            "+max" : 1,
+            ".any" : [
+               {
+                  ".ref" : "pragma_expression"
+               },
+               {
+                  ".ref" : "name"
+               }
+            ]
          },
          {
-            ".rgx" : "[\\ \\t]*;?[\\ \\t]*\\r?\\n?"
+            ".ref" : "line_ending"
          }
       ]
    },
@@ -398,7 +552,7 @@
       ]
    },
    "rhs_expr" : {
-      "+min" : 0,
+      "+min" : 1,
       ".ref" : "expr_value",
       ".sep" : {
          ".ref" : "rhs_operator"
@@ -411,8 +565,17 @@
          },
          {
             ".ref" : "bit_operator"
+         },
+         {
+            ".ref" : "shift_operator"
          }
       ]
+   },
+   "shift_assign_operator" : {
+      ".rgx" : "(<<=|>>=)"
+   },
+   "shift_operator" : {
+      ".rgx" : "(<<|>>)"
    },
    "single_conditional" : {
       ".any" : [
@@ -420,22 +583,25 @@
             ".ref" : "comparison"
          },
          {
-            ".ref" : "complement"
+            ".ref" : "expr_value"
          }
       ]
+   },
+   "single_conditional_subject" : {
+      "+min" : 1,
+      ".ref" : "any_conditional",
+      ".sep" : {
+         ".ref" : "logic_operator"
+      }
    },
    "single_quoted_string" : {
       ".rgx" : "(?:'((?:[^\\n\\\\']|\\\\'|\\\\\\\\)*?)')"
    },
    "start_block" : {
-      ".all" : [
-         {
-            ".ref" : "name"
-         },
-         {
-            ".rgx" : "[\\ \\t]*\\{[\\ \\t]*\\r?\\n?"
-         }
-      ]
+      ".rgx" : "[\\ \\t]*\\{[\\ \\t]*\\r?\\n?"
+   },
+   "start_nested_expr" : {
+      ".rgx" : "[\\ \\t]*\\([\\ \\t]*"
    },
    "statement" : {
       ".any" : [
@@ -447,6 +613,12 @@
          },
          {
             ".ref" : "expression"
+         },
+         {
+            ".ref" : "conditional_statement"
+         },
+         {
+            ".ref" : "assert_statement"
          },
          {
             ".ref" : "block"
@@ -463,40 +635,65 @@
          }
       ]
    },
-   "uc_config" : {
-      ".all" : [
+   "uc_select" : {
+      ".rgx" : "PIC[\\ \\t]+((?i:P16F690|P16F690X))[\\ \\t]*;[\\ \\t]*\\r?\\n?"
+   },
+   "unary_expr" : {
+      ".any" : [
          {
-            ".rgx" : "config"
+            ".ref" : "unary_lhs"
          },
          {
-            ".ref" : "__"
-         },
-         {
-            ".any" : [
-               {
-                  ".ref" : "name"
-               },
-               {
-                  ".ref" : "variable"
-               }
-            ]
-         },
-         {
-            ".ref" : "config_expression"
-         },
-         {
-            ".ref" : "line_ending"
+            ".ref" : "unary_rhs"
          }
       ]
    },
-   "uc_select" : {
-      ".rgx" : "PIC[\\ \\t]+((?i:P16F690|P16F690X))[\\ \\t]*;[\\ \\t]*\\r?\\n?"
+   "unary_lhs" : {
+      ".all" : [
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "unary_operator"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "variable"
+         },
+         {
+            ".ref" : "_"
+         }
+      ]
+   },
+   "unary_operator" : {
+      ".rgx" : "(\\+\\+|\\-\\-)"
+   },
+   "unary_rhs" : {
+      ".all" : [
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "variable"
+         },
+         {
+            ".ref" : "_"
+         },
+         {
+            ".ref" : "unary_operator"
+         },
+         {
+            ".ref" : "_"
+         }
+      ]
    },
    "units" : {
       ".rgx" : "(s|ms|us|kHz|Hz|MHz)"
    },
    "validated_variable" : {
-      ".ref" : "identifier"
+      ".ref" : "identifier_without_keyword"
    },
    "value" : {
       ".all" : [
@@ -518,7 +715,7 @@
                   ".ref" : "variable"
                },
                {
-                  ".ref" : "block"
+                  ".ref" : "named_block"
                },
                {
                   ".ref" : "validated_variable"
