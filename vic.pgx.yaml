@@ -1,7 +1,7 @@
 ---
 +grammar: vic
 +toprule: program
-+version: 0.1.0
++version: 0.1.1
 COMMA:
   .rgx: ','
 DOLLAR:
@@ -9,9 +9,9 @@ DOLLAR:
 EOS:
   .rgx: \z
 _:
-  .rgx: '[\ \t]*'
+  .rgx: '[\ \t]*\r?\n?'
 __:
-  .rgx: '[\ \t]+'
+  .rgx: '[\ \t]+\r?\n?'
 anonymous_block:
   .all:
   - .ref: start_block
@@ -22,6 +22,30 @@ any_conditional:
   .any:
   - .ref: single_conditional
   - .ref: nested_conditional
+array:
+  .all:
+  - .ref: start_array
+  - .ref: _
+  - +min: 0
+    .ref: array_element_type
+    .sep:
+      .ref: list_separator
+  - .ref: _
+  - .ref: end_array
+array_element:
+  .all:
+  - .ref: variable
+  - .ref: start_array
+  - .ref: rhs_expr
+  - .ref: end_array
+array_element_type:
+  .all:
+  - .ref: _
+  - .any:
+    - .ref: number_units
+    - .ref: number
+    - .ref: string
+  - .ref: _
 assert_comparison:
   .all:
   - .ref: assert_value
@@ -29,16 +53,18 @@ assert_comparison:
   - .ref: assert_value
 assert_condition:
   .ref: assert_comparison
+assert_message:
+  .all:
+  - .ref: list_separator
+  - .ref: _
+  - .ref: string
 assert_statement:
   .all:
   - .ref: name
   - .ref: assert_condition
   - .ref: _
   - +max: 1
-    .all:
-    - .ref: COMMA
-    - .ref: _
-    - .ref: string
+    .ref: assert_message
   - .ref: _
   - .ref: line_ending
 assert_value:
@@ -64,14 +90,14 @@ assign_operator:
 bit_operator:
   .rgx: ([\|\^&])
 blank_line:
-  .rgx: '[\ \t]*\r?\n'
+  .rgx: '[\ \t]*\r?\n?\r?\n'
 block:
   .ref: named_block
 boolean:
   .rgx: (TRUE|FALSE|true|false|0|1)
 comment:
   .any:
-  - .rgx: '[\ \t]*\#.*\r?\n'
+  - .rgx: '[\ \t]*\r?\n?\#.*\r?\n'
   - .ref: blank_line
 compare_operator:
   .rgx: ([!=<>]=|(?:<|>))
@@ -117,17 +143,36 @@ conditional_subject:
   .any:
   - .ref: single_conditional_subject
   - .ref: nested_conditional_subject
+constant:
+  .any:
+  - .ref: number_units
+  - .ref: number
+  - .ref: string
+  - .ref: array
+declaration:
+  .all:
+  - .ref: _
+  - .ref: variable
+  - .ref: _
+  - .rgx: =
+  - .ref: _
+  - .any:
+    - .ref: constant
+    - .ref: modifier_constant
 double_quoted_string:
   .rgx: (?:"((?:[^\n\\"]|\\"|\\\\|\\[0nt])*?)")
+end_array:
+  .rgx: '[\ \t]*\r?\n?\][\ \t]*\r?\n?'
 end_block:
-  .rgx: '[\ \t]*\}[\ \t]*\r?\n?'
+  .rgx: '[\ \t]*\r?\n?\}[\ \t]*\r?\n?\r?\n?'
 end_nested_expr:
-  .rgx: '[\ \t]*\)[\ \t]*'
+  .rgx: '[\ \t]*\r?\n?\)[\ \t]*\r?\n?'
 expr_value:
   .all:
   - .ref: _
   - .any:
     - .ref: number
+    - .ref: array_element
     - .ref: variable
     - .ref: number_units
     - .ref: complement
@@ -139,6 +184,7 @@ expression:
   - .any:
     - .ref: assign_expr
     - .ref: unary_expr
+    - .ref: declaration
   - .ref: line_ending
 header:
   .any:
@@ -154,11 +200,23 @@ instruction:
   - .ref: values
   - .ref: line_ending
 line_ending:
-  .rgx: '[\ \t]*;[\ \t]*\r?\n?'
+  .rgx: '[\ \t]*\r?\n?;[\ \t]*\r?\n?\r?\n?'
+list_separator:
+  .all:
+  - .ref: _
+  - .ref: COMMA
+  - .ref: _
+  - +max: 1
+    .ref: comment
 logic_operator:
   .rgx: ([&\|]{2})
 math_operator:
   .rgx: ([\+\-\*/%])
+modifier_constant:
+  .all:
+  - .ref: identifier_without_keyword
+  - .ref: _
+  - .ref: constant
 modifier_variable:
   .all:
   - .ref: identifier_without_keyword
@@ -200,7 +258,7 @@ number_units:
 pragma_expression:
   .all:
   - .ref: name
-  - .rgx: =[\ \t]*
+  - .rgx: =[\ \t]*\r?\n?
   - .any:
     - .ref: number_units
     - .ref: number
@@ -251,10 +309,12 @@ single_conditional_subject:
     .ref: logic_operator
 single_quoted_string:
   .rgx: (?:'((?:[^\n\\']|\\'|\\\\)*?)')
+start_array:
+  .rgx: '[\ \t]*\r?\n?\[[\ \t]*\r?\n?'
 start_block:
-  .rgx: '[\ \t]*\{[\ \t]*\r?\n?'
+  .rgx: '[\ \t]*\r?\n?\{[\ \t]*\r?\n?\r?\n?'
 start_nested_expr:
-  .rgx: '[\ \t]*\([\ \t]*'
+  .rgx: '[\ \t]*\r?\n?\([\ \t]*\r?\n?'
 statement:
   .any:
   - .ref: comment
@@ -268,7 +328,7 @@ string:
   - .ref: single_quoted_string
   - .ref: double_quoted_string
 uc_select:
-  .rgx: PIC[\ \t]+((?i:P16F690|P16F690X))[\ \t]*;[\ \t]*\r?\n?
+  .rgx: PIC[\ \t]+((?i:P16F690|P16F690X))[\ \t]*\r?\n?;[\ \t]*\r?\n?\r?\n?
 unary_expr:
   .any:
   - .ref: unary_lhs
@@ -300,16 +360,18 @@ value:
     - .ref: string
     - .ref: number_units
     - .ref: number
+    - .ref: array_element
     - .ref: variable
     - .ref: named_block
-    - .ref: validated_variable
+    - .ref: modifier_constant
     - .ref: modifier_variable
+    - .ref: validated_variable
   - .ref: _
 values:
   +min: 0
   .ref: value
   .sep:
-    .ref: COMMA
+    .ref: list_separator
 variable:
   .all:
   - .ref: DOLLAR
