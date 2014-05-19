@@ -1,7 +1,7 @@
 ---
 +grammar: vic
 +toprule: program
-+version: 0.1.1
++version: 0.2.0
 COMMA:
   .rgx: ','
 DOLLAR:
@@ -26,10 +26,14 @@ array:
   .all:
   - .ref: start_array
   - .ref: _
-  - +min: 0
-    .ref: array_element_type
-    .sep:
-      .ref: list_separator
+  - +max: 1
+    .all:
+    - .ref: array_element_type
+    - +min: 0
+      -flat: 1
+      .all:
+      - .ref: list_separator
+      - .ref: array_element_type
   - .ref: _
   - .ref: end_array
 array_element:
@@ -100,7 +104,7 @@ comment:
   - .rgx: '[\ \t]*\r?\n?\#.*\r?\n'
   - .ref: blank_line
 compare_operator:
-  .rgx: ([!=<>]=|(?:<|>))
+  .rgx: ([!=<\>]=|(?:<|\>))
 comparison:
   .all:
   - .ref: expr_value
@@ -248,7 +252,7 @@ nested_expr_value:
   - .ref: end_nested_expr
 number:
   .any:
-  - .rgx: (0[xX][0-9a-fA-F]+|-?[0-9]+)
+  - .rgx: (0[xX][0-9a-fA-F]+|\-?[0-9]+)
   - .ref: boolean
 number_units:
   .all:
@@ -285,28 +289,34 @@ program:
     .ref: statement
   - .ref: EOS
 rhs_expr:
-  +min: 1
-  .ref: expr_value
-  .sep:
-    .ref: rhs_operator
+  .all:
+  - .ref: expr_value
+  - +min: 0
+    -flat: 1
+    .all:
+    - .ref: rhs_operator
+    - .ref: expr_value
 rhs_operator:
   .any:
   - .ref: math_operator
   - .ref: bit_operator
   - .ref: shift_operator
 shift_assign_operator:
-  .rgx: (<<=|>>=)
+  .rgx: (<<=|\>\>=)
 shift_operator:
-  .rgx: (<<|>>)
+  .rgx: (<<|\>\>)
 single_conditional:
   .any:
   - .ref: comparison
   - .ref: expr_value
 single_conditional_subject:
-  +min: 1
-  .ref: any_conditional
-  .sep:
-    .ref: logic_operator
+  .all:
+  - .ref: any_conditional
+  - +min: 0
+    -flat: 1
+    .all:
+    - .ref: logic_operator
+    - .ref: any_conditional
 single_quoted_string:
   .rgx: (?:'((?:[^\n\\']|\\'|\\\\)*?)')
 start_array:
@@ -350,7 +360,7 @@ unary_rhs:
   - .ref: unary_operator
   - .ref: _
 units:
-  .rgx: (s|ms|us|kHz|Hz|MHz)
+  .rgx: ([mu]?s|[kM]?Hz)
 validated_variable:
   .ref: identifier_without_keyword
 value:
@@ -368,10 +378,14 @@ value:
     - .ref: validated_variable
   - .ref: _
 values:
-  +min: 0
-  .ref: value
-  .sep:
-    .ref: list_separator
+  +max: 1
+  .all:
+  - .ref: value
+  - +min: 0
+    -flat: 1
+    .all:
+    - .ref: list_separator
+    - .ref: value
 variable:
   .all:
   - .ref: DOLLAR

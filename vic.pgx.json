@@ -1,7 +1,7 @@
 {
    "+grammar" : "vic",
    "+toprule" : "program",
-   "+version" : "0.1.1",
+   "+version" : "0.2.0",
    "COMMA" : {
       ".rgx" : ","
    },
@@ -50,11 +50,24 @@
             ".ref" : "_"
          },
          {
-            "+min" : 0,
-            ".ref" : "array_element_type",
-            ".sep" : {
-               ".ref" : "list_separator"
-            }
+            "+max" : 1,
+            ".all" : [
+               {
+                  ".ref" : "array_element_type"
+               },
+               {
+                  "+min" : 0,
+                  "-flat" : 1,
+                  ".all" : [
+                     {
+                        ".ref" : "list_separator"
+                     },
+                     {
+                        ".ref" : "array_element_type"
+                     }
+                  ]
+               }
+            ]
          },
          {
             ".ref" : "_"
@@ -233,7 +246,7 @@
       ]
    },
    "compare_operator" : {
-      ".rgx" : "([!=<>]=|(?:<|>))"
+      ".rgx" : "([!=<\\>]=|(?:<|\\>))"
    },
    "comparison" : {
       ".all" : [
@@ -602,7 +615,7 @@
    "number" : {
       ".any" : [
          {
-            ".rgx" : "(0[xX][0-9a-fA-F]+|-?[0-9]+)"
+            ".rgx" : "(0[xX][0-9a-fA-F]+|\\-?[0-9]+)"
          },
          {
             ".ref" : "boolean"
@@ -701,11 +714,23 @@
       ]
    },
    "rhs_expr" : {
-      "+min" : 1,
-      ".ref" : "expr_value",
-      ".sep" : {
-         ".ref" : "rhs_operator"
-      }
+      ".all" : [
+         {
+            ".ref" : "expr_value"
+         },
+         {
+            "+min" : 0,
+            "-flat" : 1,
+            ".all" : [
+               {
+                  ".ref" : "rhs_operator"
+               },
+               {
+                  ".ref" : "expr_value"
+               }
+            ]
+         }
+      ]
    },
    "rhs_operator" : {
       ".any" : [
@@ -721,10 +746,10 @@
       ]
    },
    "shift_assign_operator" : {
-      ".rgx" : "(<<=|>>=)"
+      ".rgx" : "(<<=|\\>\\>=)"
    },
    "shift_operator" : {
-      ".rgx" : "(<<|>>)"
+      ".rgx" : "(<<|\\>\\>)"
    },
    "single_conditional" : {
       ".any" : [
@@ -737,11 +762,23 @@
       ]
    },
    "single_conditional_subject" : {
-      "+min" : 1,
-      ".ref" : "any_conditional",
-      ".sep" : {
-         ".ref" : "logic_operator"
-      }
+      ".all" : [
+         {
+            ".ref" : "any_conditional"
+         },
+         {
+            "+min" : 0,
+            "-flat" : 1,
+            ".all" : [
+               {
+                  ".ref" : "logic_operator"
+               },
+               {
+                  ".ref" : "any_conditional"
+               }
+            ]
+         }
+      ]
    },
    "single_quoted_string" : {
       ".rgx" : "(?:'((?:[^\\n\\\\']|\\\\'|\\\\\\\\)*?)')"
@@ -842,7 +879,7 @@
       ]
    },
    "units" : {
-      ".rgx" : "(s|ms|us|kHz|Hz|MHz)"
+      ".rgx" : "([mu]?s|[kM]?Hz)"
    },
    "validated_variable" : {
       ".ref" : "identifier_without_keyword"
@@ -889,11 +926,24 @@
       ]
    },
    "values" : {
-      "+min" : 0,
-      ".ref" : "value",
-      ".sep" : {
-         ".ref" : "list_separator"
-      }
+      "+max" : 1,
+      ".all" : [
+         {
+            ".ref" : "value"
+         },
+         {
+            "+min" : 0,
+            "-flat" : 1,
+            ".all" : [
+               {
+                  ".ref" : "list_separator"
+               },
+               {
+                  ".ref" : "value"
+               }
+            ]
+         }
+      ]
    },
    "variable" : {
       ".all" : [
