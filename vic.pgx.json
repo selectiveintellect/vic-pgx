@@ -524,6 +524,9 @@
    "math_operator" : {
       ".rgx" : "([\\+\\-\\*/%])"
    },
+   "mcu_select" : {
+      ".rgx" : "PIC[\\ \\t]+([a-zA-Z][0-9]+[a-zA-Z][0-9]+)[\\ \\t]*\\r?\\n?;[\\ \\t]*\\r?\\n?\\r?\\n?"
+   },
    "modifier_constant" : {
       ".all" : [
          {
@@ -698,7 +701,7 @@
    "program" : {
       ".all" : [
          {
-            ".ref" : "uc_select"
+            ".ref" : "mcu_select"
          },
          {
             "+min" : 0,
@@ -823,9 +826,6 @@
             ".ref" : "double_quoted_string"
          }
       ]
-   },
-   "uc_select" : {
-      ".rgx" : "PIC[\\ \\t]+((?i:P16F690|P16F690X))[\\ \\t]*\\r?\\n?;[\\ \\t]*\\r?\\n?\\r?\\n?"
    },
    "unary_expr" : {
       ".any" : [

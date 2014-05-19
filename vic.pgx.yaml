@@ -216,6 +216,8 @@ logic_operator:
   .rgx: ([&\|]{2})
 math_operator:
   .rgx: ([\+\-\*/%])
+mcu_select:
+  .rgx: PIC[\ \t]+([a-zA-Z][0-9]+[a-zA-Z][0-9]+)[\ \t]*\r?\n?;[\ \t]*\r?\n?\r?\n?
 modifier_constant:
   .all:
   - .ref: identifier_without_keyword
@@ -282,7 +284,7 @@ pragmas:
   - .ref: line_ending
 program:
   .all:
-  - .ref: uc_select
+  - .ref: mcu_select
   - +min: 0
     .ref: header
   - +min: 0
@@ -337,8 +339,6 @@ string:
   .any:
   - .ref: single_quoted_string
   - .ref: double_quoted_string
-uc_select:
-  .rgx: PIC[\ \t]+((?i:P16F690|P16F690X))[\ \t]*\r?\n?;[\ \t]*\r?\n?\r?\n?
 unary_expr:
   .any:
   - .ref: unary_lhs
