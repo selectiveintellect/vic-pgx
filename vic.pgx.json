@@ -1,7 +1,7 @@
 {
    "+grammar" : "vic",
    "+toprule" : "program",
-   "+version" : "0.2.0",
+   "+version" : "0.2.1",
    "COMMA" : {
       ".rgx" : ","
    },
@@ -879,7 +879,7 @@
       ]
    },
    "units" : {
-      ".rgx" : "([mu]?s|[kM]?Hz)"
+      ".rgx" : "([mu]?s|[kM]?Hz|%)"
    },
    "validated_variable" : {
       ".ref" : "identifier_without_keyword"
