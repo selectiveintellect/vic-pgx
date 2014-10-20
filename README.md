@@ -5,7 +5,7 @@ A Pegex file for VIC so that other languages can generate their own versions.
 
 # Details
 
-For a direct usable VIC software refer [vic](https://github.com/vikasnkumar/vic.git)
+For a direct usable VIC software refer [vic](https://github.com/selectiveintellect/vic.git)
 
 #Contributors
 
@@ -14,6 +14,6 @@ For a direct usable VIC software refer [vic](https://github.com/vikasnkumar/vic.
 
 #Copyright
 
-Copyright: 2014. Vikas N Kumar. All Rights Reserved.
+Copyright: 2014. Selective Intellect LLC. All Rights Reserved.
 
 LICENSE: refer LICENSE file in the repository.
