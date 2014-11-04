@@ -1,7 +1,7 @@
 {
    "+grammar" : "vic",
    "+toprule" : "program",
-   "+version" : "0.2.1",
+   "+version" : "0.2.2",
    "COMMA" : {
       ".rgx" : ","
    },
@@ -525,7 +525,7 @@
       ".rgx" : "([\\+\\-\\*/%])"
    },
    "mcu_select" : {
-      ".rgx" : "PIC[\\ \\t]+([a-zA-Z][0-9]+[a-zA-Z][0-9]+)[\\ \\t]*\\r?\\n?;[\\ \\t]*\\r?\\n?\\r?\\n?"
+      ".rgx" : "PIC[\\ \\t]+([a-zA-Z][0-9]+[a-zA-Z][0-9]+|Any)[\\ \\t]*\\r?\\n?;[\\ \\t]*\\r?\\n?\\r?\\n?"
    },
    "modifier_constant" : {
       ".all" : [
@@ -700,6 +700,10 @@
    },
    "program" : {
       ".all" : [
+         {
+            "+min" : 0,
+            ".ref" : "comment"
+         },
          {
             ".ref" : "mcu_select"
          },
