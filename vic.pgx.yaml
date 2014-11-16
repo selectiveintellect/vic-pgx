@@ -1,7 +1,7 @@
 ---
 +grammar: vic
 +toprule: program
-+version: 0.2.2
++version: 0.2.3
 COMMA:
   .rgx: ','
 DOLLAR:
@@ -364,7 +364,9 @@ unary_rhs:
 units:
   .rgx: ([mu]?s|[kM]?Hz|%)
 validated_variable:
-  .ref: identifier_without_keyword
+  .all:
+  - .ref: identifier_without_keyword
+  - .rgx: ([+-]?)
 value:
   .all:
   - .ref: _
