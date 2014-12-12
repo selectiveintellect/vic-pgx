@@ -1,7 +1,7 @@
 {
    "+grammar" : "vic",
    "+toprule" : "program",
-   "+version" : "0.2.3",
+   "+version" : "0.2.5",
    "COMMA" : {
       ".rgx" : ","
    },
@@ -102,6 +102,9 @@
             ".any" : [
                {
                   ".ref" : "number_units"
+               },
+               {
+                  ".ref" : "real_number"
                },
                {
                   ".ref" : "number"
@@ -525,7 +528,7 @@
       ".rgx" : "([\\+\\-\\*/%])"
    },
    "mcu_select" : {
-      ".rgx" : "PIC[\\ \\t]+([a-zA-Z][0-9]+[a-zA-Z][0-9]+|Any)[\\ \\t]*\\r?\\n?;[\\ \\t]*\\r?\\n?\\r?\\n?"
+      ".rgx" : "PIC[\\ \\t]+([a-zA-Z]+[0-9]+[a-zA-Z][0-9]+[a-zA-Z]?|Any)[\\ \\t]*\\r?\\n?;[\\ \\t]*\\r?\\n?\\r?\\n?"
    },
    "modifier_constant" : {
       ".all" : [
@@ -717,6 +720,16 @@
          },
          {
             ".ref" : "EOS"
+         }
+      ]
+   },
+   "real_number" : {
+      ".any" : [
+         {
+            ".rgx" : "(\\-?[0-9]*\\.[0-9]+)"
+         },
+         {
+            ".rgx" : "(\\-?[0-9]+\\.[0-9]*)"
          }
       ]
    },

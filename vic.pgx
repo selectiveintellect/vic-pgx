@@ -1,5 +1,5 @@
 %grammar vic
-%version 0.2.3
+%version 0.2.5
 #COPYRIGHT: 2014 Vikas N Kumar <vikas@cpan.org>. All Rights Reserved
 
 # mcu-select is necessary.
@@ -7,7 +7,7 @@ program: comment* mcu-select header* statement* EOS
 
 header: pragmas | comment
 mcu-select: /'PIC' BLANK+ ( mcu-types | 'Any' ) line-ending/
-mcu-types: / ALPHA DIGIT+ ALPHA DIGIT+ / # the uc names are like P16F690 or P16F84 etc.
+mcu-types: / ALPHA+ DIGIT+ ALPHA DIGIT+ ALPHA? / # the uc names are like P16F690 or P16F84 or P16F628A etc.
 pragmas: 'pragma' + (variable | name) (pragma-expression | name)? line-ending
 pragma-expression: name / EQUAL -/ (number-units | number | string) -
 
@@ -93,6 +93,7 @@ string: single-quoted-string | double-quoted-string
 number-units: number - units
 # number handles both hex and non-hex values for ease of use
 number: /('0'[xX] HEX+ | '-'? DIGIT+)/ | boolean
+real-number: /('-'? DIGIT* '.' DIGIT+)/ | /('-'? DIGIT+ '.' DIGIT*)/
 units: /([mu]?'s'|[kM]?'Hz' | '%')/
 boolean: /('TRUE'|'FALSE'|'true'|'false'|'0'|'1')/
 
@@ -102,7 +103,7 @@ modifier-constant: identifier-without-keyword - constant
 variable: DOLLAR identifier
 constant: number-units | number | string | array
 array: start-array - array-element-type* % list-separator - end-array
-array-element-type: - (number-units | number | string) -
+array-element-type: - (number-units | real-number | number | string) -
 identifier-without-keyword: /(! keyword)( ALPHA[ WORDS]*)/
 identifier: /( ALPHA [ WORDS ]*)/
 keyword: /'if'|'else'|'while'|'true'|'false'|'TRUE'|'FALSE'/
