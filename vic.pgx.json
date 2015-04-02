@@ -400,6 +400,9 @@
                },
                {
                   ".ref" : "modifier_constant"
+               },
+               {
+                  ".ref" : "parameter"
                }
             ]
          }
@@ -640,6 +643,9 @@
             ".ref" : "units"
          }
       ]
+   },
+   "parameter" : {
+      ".rgx" : "shift"
    },
    "pragma_expression" : {
       ".all" : [

@@ -164,6 +164,7 @@ declaration:
   - .any:
     - .ref: constant
     - .ref: modifier_constant
+    - .ref: parameter
 double_quoted_string:
   .rgx: (?:"((?:[^\n\\"]|\\"|\\\\|\\[0nt])*?)")
 end_array:
@@ -262,6 +263,8 @@ number_units:
   - .ref: number
   - .ref: _
   - .ref: units
+parameter:
+  .rgx: shift
 pragma_expression:
   .all:
   - .ref: name
