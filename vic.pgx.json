@@ -1,7 +1,7 @@
 {
    "+grammar" : "vic",
    "+toprule" : "program",
-   "+version" : "0.2.6",
+   "+version" : "0.2.7",
    "COMMA" : {
       ".rgx" : ","
    },
@@ -219,7 +219,7 @@
    "assign_operator" : {
       ".any" : [
          {
-            ".rgx" : "([\\+\\-%\\^\\*\\|&/]?=)"
+            ".rgx" : "([\\+\\-%\\^\\*\\|&/\\.]?=)"
          },
          {
             ".ref" : "shift_assign_operator"
@@ -400,9 +400,6 @@
                },
                {
                   ".ref" : "modifier_constant"
-               },
-               {
-                  ".ref" : "parameter"
                }
             ]
          }
@@ -427,6 +424,9 @@
          },
          {
             ".any" : [
+               {
+                  ".ref" : "parameter"
+               },
                {
                   ".ref" : "number"
                },
